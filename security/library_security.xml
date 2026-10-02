@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Security Groups -->
+    <record id="module_library_management" model="ir.module.category">
+        <field name="name">Library Management</field>
+        <field name="description">Manage your library system</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- Librarian (basic user) -->
+    <record id="group_library_user" model="res.groups">
+        <field name="name">Librarian</field>
+        <field name="category_id" ref="module_library_management"/>
+        <field name="comment">Can manage day-to-day library operations: borrow, return, view reports.</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Library Manager -->
+    <record id="group_library_manager" model="res.groups">
+        <field name="name">Library Manager</field>
+        <field name="category_id" ref="module_library_management"/>
+        <field name="comment">Full access: manage books, members, settings, fines, and reports.</field>
+        <field name="implied_ids" eval="[(4, ref('group_library_user'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="return_book_wizard_view_form" model="ir.ui.view">
+        <field name="name">return.book.wizard.view.form</field>
+        <field name="model">return.book.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Return a Book">
+                <sheet>
+                    <div class="text-center mb-3">
+                        <h3><i class="fa fa-undo me-2 text-success"/>Return a Book</h3>
+                        <p class="text-muted">Process a book return and calculate any applicable fines.</p>
+                    </div>
+                    <group>
+                        <group string="Borrowing">
+                            <field name="member_id" options="{'no_create': True}"/>
+                            <field name="borrowing_id" options="{'no_create': True}"/>
+                            <field name="book_id" readonly="1"/>
+                        </group>
+                        <group string="Dates">
+                            <field name="borrow_date" readonly="1"/>
+                            <field name="due_date" readonly="1"/>
+                            <field name="return_date"/>
+                            <field name="overdue_days" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Book Condition">
+                            <field name="condition" widget="radio"/>
+                        </group>
+                        <group string="Fine Calculation">
+                            <field name="calculated_fine" readonly="1" widget="monetary"/>
+                            <field name="additional_fine" widget="monetary"/>
+                            <field name="total_fine" readonly="1" widget="monetary"/>
+                            <field name="waive_fine" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Notes about the return..."/>
+                    </group>
+                    <div class="alert alert-warning" invisible="overdue_days == 0 or waive_fine">
+                        <i class="fa fa-exclamation-triangle me-1"/>
+                        This book is <b><field name="overdue_days"/> days</b> overdue.
+                        Fine of <b><field name="total_fine" widget="monetary"/></b> will be applied.
+                    </div>
+                    <div class="alert alert-success" invisible="not waive_fine">
+                        <i class="fa fa-check me-1"/>Fine will be <b>waived</b>.
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_return" string="Process Return"
+                            type="object" class="btn-success"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="return_book_wizard_action" model="ir.actions.act_window">
+        <field name="name">Return a Book</field>
+        <field name="res_model">return.book.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

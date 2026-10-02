@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Fine List View -->
+    <record id="library_fine_view_list" model="ir.ui.view">
+        <field name="name">library.fine.view.list</field>
+        <field name="model">library.fine</field>
+        <field name="arch" type="xml">
+            <list string="Fines"
+                  decoration-danger="state == 'unpaid'"
+                  decoration-success="state == 'paid'"
+                  decoration-muted="state == 'waived'">
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="book_id"/>
+                <field name="date"/>
+                <field name="reason"/>
+                <field name="amount" widget="monetary"/>
+                <field name="state" widget="badge"
+                       decoration-danger="state == 'unpaid'"
+                       decoration-success="state == 'paid'"
+                       decoration-warning="state == 'waived'"/>
+                <field name="paid_date" optional="show"/>
+                <button name="action_pay" string="Mark Paid" type="object"
+                        class="btn-sm btn-success" invisible="state != 'unpaid'"/>
+                <button name="action_waive" string="Waive" type="object"
+                        class="btn-sm btn-warning" invisible="state != 'unpaid'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Fine Form View -->
+    <record id="library_fine_view_form" model="ir.ui.view">
+        <field name="name">library.fine.view.form</field>
+        <field name="model">library.fine</field>
+        <field name="arch" type="xml">
+            <form string="Fine">
+                <header>
+                    <button name="action_pay" string="Mark as Paid"
+                            type="object" class="btn-success" invisible="state != 'unpaid'"/>
+                    <button name="action_waive" string="Waive Fine"
+                            type="object" class="btn-warning" invisible="state != 'unpaid'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="unpaid,paid,waived"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="member_id"/>
+                            <field name="borrowing_id"/>
+                            <field name="book_id" readonly="1"/>
+                            <field name="reason"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="amount" widget="monetary"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="paid_date" invisible="state != 'paid'"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notes..."/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Fine Search View -->
+    <record id="library_fine_view_search" model="ir.ui.view">
+        <field name="name">library.fine.view.search</field>
+        <field name="model">library.fine</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="member_id"/>
+                <filter string="Unpaid" name="unpaid" domain="[('state','=','unpaid')]"/>
+                <filter string="Paid" name="paid" domain="[('state','=','paid')]"/>
+                <filter string="Waived" name="waived" domain="[('state','=','waived')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Member" name="group_member" context="{'group_by': 'member_id'}"/>
+                    <filter string="Reason" name="group_reason" context="{'group_by': 'reason'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Fine Action -->
+    <record id="library_fine_action" model="ir.actions.act_window">
+        <field name="name">Fines</field>
+        <field name="res_model">library.fine</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_unpaid': 1}</field>
+        <field name="search_view_id" ref="library_fine_view_search"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="1">
+
+        <!-- Book Categories -->
+        <record id="category_fiction" model="library.category">
+            <field name="name">Fiction</field>
+            <field name="color">1</field>
+        </record>
+        <record id="category_non_fiction" model="library.category">
+            <field name="name">Non-Fiction</field>
+            <field name="color">2</field>
+        </record>
+        <record id="category_science" model="library.category">
+            <field name="name">Science &amp; Technology</field>
+            <field name="color">3</field>
+        </record>
+        <record id="category_history" model="library.category">
+            <field name="name">History</field>
+            <field name="color">4</field>
+        </record>
+        <record id="category_biography" model="library.category">
+            <field name="name">Biography</field>
+            <field name="color">5</field>
+        </record>
+        <record id="category_children" model="library.category">
+            <field name="name">Children</field>
+            <field name="color">6</field>
+        </record>
+        <record id="category_philosophy" model="library.category">
+            <field name="name">Philosophy</field>
+            <field name="color">7</field>
+        </record>
+        <record id="category_business" model="library.category">
+            <field name="name">Business &amp; Economics</field>
+            <field name="color">8</field>
+        </record>
+        <record id="category_religion" model="library.category">
+            <field name="name">Religion &amp; Spirituality</field>
+            <field name="color">9</field>
+        </record>
+        <record id="category_mystery" model="library.category">
+            <field name="name">Mystery &amp; Thriller</field>
+            <field name="parent_id" ref="category_fiction"/>
+            <field name="color">10</field>
+        </record>
+        <record id="category_romance" model="library.category">
+            <field name="name">Romance</field>
+            <field name="parent_id" ref="category_fiction"/>
+            <field name="color">11</field>
+        </record>
+        <record id="category_scifi" model="library.category">
+            <field name="name">Science Fiction</field>
+            <field name="parent_id" ref="category_fiction"/>
+            <field name="color">3</field>
+        </record>
+        <record id="category_programming" model="library.category">
+            <field name="name">Programming</field>
+            <field name="parent_id" ref="category_science"/>
+            <field name="color">4</field>
+        </record>
+
+        <!-- Tags -->
+        <record id="tag_bestseller" model="library.tag">
+            <field name="name">Bestseller</field>
+            <field name="color">1</field>
+        </record>
+        <record id="tag_award_winner" model="library.tag">
+            <field name="name">Award Winner</field>
+            <field name="color">2</field>
+        </record>
+        <record id="tag_classic" model="library.tag">
+            <field name="name">Classic</field>
+            <field name="color">3</field>
+        </record>
+        <record id="tag_new_arrival" model="library.tag">
+            <field name="name">New Arrival</field>
+            <field name="color">4</field>
+        </record>
+        <record id="tag_recommended" model="library.tag">
+            <field name="name">Recommended</field>
+            <field name="color">5</field>
+        </record>
+
+    </data>
+
+</odoo>

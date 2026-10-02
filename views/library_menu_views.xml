@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Root Menu -->
+    <menuitem id="library_root_menu"
+              name="Library"
+              web_icon="library_management,static/src/img/icon.png"
+              sequence="50"/>
+
+    <!-- Dashboard Menu -->
+    <menuitem id="library_dashboard_menu"
+              name="Dashboard"
+              parent="library_root_menu"
+              action="library_dashboard_action"
+              sequence="10"/>
+
+    <!-- Circulation Menu -->
+    <menuitem id="library_circulation_menu"
+              name="Circulation"
+              parent="library_root_menu"
+              sequence="20"/>
+
+    <menuitem id="library_borrow_menu"
+              name="Borrowings"
+              parent="library_circulation_menu"
+              action="library_borrowing_action"
+              sequence="21"/>
+
+    <menuitem id="library_overdue_menu"
+              name="Overdue Books"
+              parent="library_circulation_menu"
+              action="library_borrowing_overdue_action"
+              sequence="22"/>
+
+    <menuitem id="library_active_borrow_menu"
+              name="Active Borrows"
+              parent="library_circulation_menu"
+              action="library_borrowing_active_action"
+              sequence="23"/>
+
+    <menuitem id="library_reservation_menu"
+              name="Reservations"
+              parent="library_circulation_menu"
+              action="library_reservation_action"
+              sequence="24"/>
+
+    <menuitem id="library_fine_menu"
+              name="Fines"
+              parent="library_circulation_menu"
+              action="library_fine_action"
+              sequence="25"/>
+
+    <!-- Catalog Menu -->
+    <menuitem id="library_catalog_menu"
+              name="Catalog"
+              parent="library_root_menu"
+              sequence="30"/>
+
+    <menuitem id="library_book_menu"
+              name="Books"
+              parent="library_catalog_menu"
+              action="library_book_action"
+              sequence="31"/>
+
+    <menuitem id="library_author_menu"
+              name="Authors"
+              parent="library_catalog_menu"
+              action="library_author_action"
+              sequence="32"/>
+
+    <menuitem id="library_category_menu"
+              name="Categories"
+              parent="library_catalog_menu"
+              action="library_category_action"
+              sequence="33"/>
+
+    <menuitem id="library_publisher_menu"
+              name="Publishers"
+              parent="library_catalog_menu"
+              action="library_publisher_action"
+              sequence="34"/>
+
+    <!-- Members Menu -->
+    <menuitem id="library_members_menu"
+              name="Members"
+              parent="library_root_menu"
+              sequence="40"/>
+
+    <menuitem id="library_member_list_menu"
+              name="All Members"
+              parent="library_members_menu"
+              action="library_member_action"
+              sequence="41"/>
+
+    <!-- Reporting Menu -->
+    <menuitem id="library_reports_menu"
+              name="Reports"
+              parent="library_root_menu"
+              sequence="90"/>
+
+    <menuitem id="library_report_borrowing_menu"
+              name="Borrowing Report"
+              parent="library_reports_menu"
+              action="action_report_borrowing_list"
+              sequence="91"/>
+
+    <menuitem id="library_report_overdue_menu"
+              name="Overdue Report"
+              parent="library_reports_menu"
+              action="action_report_overdue_list"
+              sequence="92"/>
+
+    <!-- Wizard Menus -->
+    <menuitem id="library_wizard_menu"
+              name="Wizards"
+              parent="library_circulation_menu"
+              sequence="29"/>
+
+    <menuitem id="library_borrow_wizard_menu"
+              name="Issue a Book"
+              parent="library_wizard_menu"
+              action="borrow_book_wizard_action"
+              sequence="291"/>
+
+    <menuitem id="library_return_wizard_menu"
+              name="Return a Book"
+              parent="library_wizard_menu"
+              action="return_book_wizard_action"
+              sequence="292"/>
+
+</odoo>
