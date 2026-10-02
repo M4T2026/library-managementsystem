@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Publishers ──────────────────────────────────────────── -->
+    <record id="demo_publisher_penguin" model="library.publisher">
+        <field name="name">Penguin Random House</field>
+        <field name="email">contact@penguinrandomhouse.com</field>
+        <field name="website">https://www.penguinrandomhouse.com</field>
+        <field name="city">New York</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+
+    <record id="demo_publisher_harpercollins" model="library.publisher">
+        <field name="name">HarperCollins</field>
+        <field name="email">info@harpercollins.com</field>
+        <field name="website">https://www.harpercollins.com</field>
+        <field name="city">New York</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+
+    <record id="demo_publisher_oreilly" model="library.publisher">
+        <field name="name">O'Reilly Media</field>
+        <field name="email">info@oreilly.com</field>
+        <field name="website">https://www.oreilly.com</field>
+        <field name="city">Sebastopol</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+
+    <!-- ── Authors ─────────────────────────────────────────────── -->
+    <record id="demo_author_tolkien" model="library.author">
+        <field name="name">J.R.R. Tolkien</field>
+        <field name="nationality" ref="base.uk"/>
+        <field name="birth_date">1892-01-03</field>
+        <field name="death_date">1973-09-02</field>
+        <field name="gender">male</field>
+        <field name="biography">&lt;p&gt;John Ronald Reuel Tolkien was an English author and philologist. He is best known as the author of The Hobbit and The Lord of the Rings.&lt;/p&gt;</field>
+    </record>
+
+    <record id="demo_author_orwell" model="library.author">
+        <field name="name">George Orwell</field>
+        <field name="nationality" ref="base.uk"/>
+        <field name="birth_date">1903-06-25</field>
+        <field name="death_date">1950-01-21</field>
+        <field name="gender">male</field>
+    </record>
+
+    <record id="demo_author_rowling" model="library.author">
+        <field name="name">J.K. Rowling</field>
+        <field name="nationality" ref="base.uk"/>
+        <field name="birth_date">1965-07-31</field>
+        <field name="gender">female</field>
+    </record>
+
+    <record id="demo_author_agatha" model="library.author">
+        <field name="name">Agatha Christie</field>
+        <field name="nationality" ref="base.uk"/>
+        <field name="birth_date">1890-09-15</field>
+        <field name="death_date">1976-01-12</field>
+        <field name="gender">female</field>
+    </record>
+
+    <record id="demo_author_martin" model="library.author">
+        <field name="name">George R.R. Martin</field>
+        <field name="nationality" ref="base.us"/>
+        <field name="birth_date">1948-09-20</field>
+        <field name="gender">male</field>
+    </record>
+
+    <record id="demo_author_hawking" model="library.author">
+        <field name="name">Stephen Hawking</field>
+        <field name="nationality" ref="base.uk"/>
+        <field name="birth_date">1942-01-08</field>
+        <field name="death_date">2018-03-14</field>
+        <field name="gender">male</field>
+    </record>
+
+    <!-- ── Books ───────────────────────────────────────────────── -->
+    <record id="demo_book_lotr" model="library.book">
+        <field name="name">The Lord of the Rings</field>
+        <field name="isbn">978-0-618-64015-7</field>
+        <field name="author_ids" eval="[(4, ref('demo_author_tolkien'))]"/>
+        <field name="category_id" ref="data.category_fiction"/>
+        <field name="publisher_id" ref="demo_publisher_penguin"/>
+        <field name="language">en</field>
+        <field name="publication_year">1954</field>
+        <field name="pages">1178</field>
+        <field name="total_copies">3</field>
+        <field name="location">Shelf A-1</field>
+        <field name="price">24.99</field>
+        <field name="tag_ids" eval="[(4, ref('data.tag_classic')), (4, ref('data.tag_bestseller'))]"/>
+        <field name="short_description">An epic high-fantasy novel set in the fictional world of Middle-earth.</field>
+    </record>
+
+    <record id="demo_book_1984" model="library.book">
+        <field name="name">1984</field>
+        <field name="isbn">978-0-452-28423-4</field>
+        <field name="author_ids" eval="[(4, ref('demo_author_orwell'))]"/>
+        <field name="category_id" ref="data.category_fiction"/>
+        <field name="publisher_id" ref="demo_publisher_penguin"/>
+        <field name="language">en</field>
+        <field name="publication_year">1949</field>
+        <field name="pages">328</field>
+        <field name="total_copies">5</field>
+        <field name="location">Shelf A-2</field>
+        <field name="price">12.99</field>
+        <field name="tag_ids" eval="[(4, ref('data.tag_classic'))]"/>
+        <field name="short_description">A dystopian social science fiction novel about totalitarianism.</field>
+    </record>
+
+    <record id="demo_book_hp1" model="library.book">
+        <field name="name">Harry Potter and the Philosopher's Stone</field>
+        <field name="isbn">978-0-7475-3269-9</field>
+        <field name="author_ids" eval="[(4, ref('demo_author_rowling'))]"/>
+        <field name="category_id" ref="data.category_fiction"/>
+        <field name="publisher_id" ref="demo_publisher_harpercollins"/>
+        <field name="language">en</field>
+        <field name="publication_year">1997</field>
+        <field name="pages">223</field>
+        <field name="total_copies">4</field>
+        <field name="location">Shelf B-1</field>
+        <field name="price">15.99</field>
+        <field name="tag_ids" eval="[(4, ref('data.tag_bestseller')), (4, ref('data.tag_award_winner'))]"/>
+        <field name="short_description">The story of Harry Potter, an orphan who discovers he is a wizard.</field>
+    </record>
+
+    <record id="demo_book_murder" model="library.book">
+        <field name="name">Murder on the Orient Express</field>
+        <field name="isbn">978-0-06-207350-2</field>
+        <field name="author_ids" eval="[(4, ref('demo_author_agatha'))]"/>
+        <field name="category_id" ref="data.category_mystery"/>
+        <field name="publisher_id" ref="demo_publisher_harpercollins"/>
+        <field name="language">en</field>
+        <field name="publication_year">1934</field>
+        <field name="pages">256</field>
+        <field name="total_copies">2</field>
+        <field name="location">Shelf C-3</field>
+        <field name="price">11.99</field>
+        <field name="tag_ids" eval="[(4, ref('data.tag_classic'))]"/>
+    </record>
+
+    <record id="demo_book_brief_history" model="library.book">
+        <field name="name">A Brief History of Time</field>
+        <field name="isbn">978-0-553-38016-3</field>
+        <field name="author_ids" eval="[(4, ref('demo_author_hawking'))]"/>
+        <field name="category_id" ref="data.category_science"/>
+        <field name="publisher_id" ref="demo_publisher_penguin"/>
+        <field name="language">en</field>
+        <field name="publication_year">1988</field>
+        <field name="pages">212</field>
+        <field name="total_copies">3</field>
+        <field name="location">Shelf D-1</field>
+        <field name="price">16.99</field>
+        <field name="tag_ids" eval="[(4, ref('data.tag_bestseller'))]"/>
+        <field name="short_description">From the Big Bang to black holes – Hawking's landmark book.</field>
+    </record>
+
+    <!-- ── Members ─────────────────────────────────────────────── -->
+    <record id="demo_member_ali" model="library.member">
+        <field name="name">Ali Hassan</field>
+        <field name="email">ali.hassan@example.com</field>
+        <field name="phone">+923001234567</field>
+        <field name="gender">male</field>
+        <field name="membership_type">premium</field>
+        <field name="membership_start">2026-01-01</field>
+        <field name="membership_end">2026-12-31</field>
+        <field name="state">active</field>
+        <field name="city">Lahore</field>
+        <field name="id_type">national_id</field>
+        <field name="id_number">3520112345678</field>
+    </record>
+
+    <record id="demo_member_fatima" model="library.member">
+        <field name="name">Fatima Khan</field>
+        <field name="email">fatima.khan@example.com</field>
+        <field name="phone">+923009876543</field>
+        <field name="gender">female</field>
+        <field name="membership_type">student</field>
+        <field name="membership_start">2026-03-01</field>
+        <field name="membership_end">2026-12-31</field>
+        <field name="state">active</field>
+        <field name="city">Karachi</field>
+    </record>
+
+    <record id="demo_member_usman" model="library.member">
+        <field name="name">Usman Ahmed</field>
+        <field name="email">usman.ahmed@example.com</field>
+        <field name="phone">+923331234567</field>
+        <field name="gender">male</field>
+        <field name="membership_type">standard</field>
+        <field name="membership_start">2026-02-15</field>
+        <field name="membership_end">2026-12-31</field>
+        <field name="state">active</field>
+        <field name="city">Islamabad</field>
+    </record>
+
+    <record id="demo_member_sara" model="library.member">
+        <field name="name">Sara Malik</field>
+        <field name="email">sara.malik@example.com</field>
+        <field name="phone">+923211234567</field>
+        <field name="gender">female</field>
+        <field name="membership_type">standard</field>
+        <field name="membership_start">2025-06-01</field>
+        <field name="membership_end">2025-12-31</field>
+        <field name="state">expired</field>
+        <field name="city">Lahore</field>
+    </record>
+
+</odoo>

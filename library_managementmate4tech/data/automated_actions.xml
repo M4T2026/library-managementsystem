@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="1">
+
+        <!-- Automated Action: Mark overdue borrowings daily -->
+        <record id="action_mark_overdue_borrowings" model="base.automation">
+            <field name="name">Library: Mark Overdue Borrowings</field>
+            <field name="model_id" ref="model_library_borrowing"/>
+            <field name="trigger">on_time</field>
+            <field name="active" eval="True"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="code">
+for record in env['library.borrowing'].search([
+    ('state', '=', 'borrowed'),
+    ('due_date', '&lt;', fields.Date.today()),
+]):
+    overdue_days = (fields.Date.today() - record.due_date).days
+    record.write({
+        'state': 'overdue',
+        'fine_amount': overdue_days * record.fine_per_day,
+    })
+            </field>
+        </record>
+
+        <!-- Automated Action: Send due-date reminder 1 day before -->
+        <record id="action_send_due_reminder" model="base.automation">
+            <field name="name">Library: Due Date Reminder Email</field>
+            <field name="model_id" ref="model_library_borrowing"/>
+            <field name="trigger">on_time</field>
+            <field name="active" eval="True"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="code">
+from datetime import date, timedelta
+tomorrow = date.today() + timedelta(days=1)
+records = env['library.borrowing'].search([
+    ('state', '=', 'borrowed'),
+    ('due_date', '=', tomorrow),
+    ('member_id.email', '!=', False),
+])
+template = env.ref('library_management.email_template_due_reminder', raise_if_not_found=False)
+if template:
+    for rec in records:
+        template.send_mail(rec.id, force_send=True)
+            </field>
+        </record>
+
+        <!-- Automated Action: Send overdue notice daily -->
+        <record id="action_send_overdue_notice" model="base.automation">
+            <field name="name">Library: Overdue Notice Email</field>
+            <field name="model_id" ref="model_library_borrowing"/>
+            <field name="trigger">on_time</field>
+            <field name="active" eval="True"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="code">
+records = env['library.borrowing'].search([
+    ('state', '=', 'overdue'),
+    ('member_id.email', '!=', False),
+])
+template = env.ref('library_management.email_template_overdue_notice', raise_if_not_found=False)
+if template:
+    for rec in records:
+        template.send_mail(rec.id, force_send=True)
+            </field>
+        </record>
+
+        <!-- Automated Action: Expire reservations -->
+        <record id="action_expire_reservations" model="base.automation">
+            <field name="name">Library: Expire Old Reservations</field>
+            <field name="model_id" ref="model_library_reservation"/>
+            <field name="trigger">on_time</field>
+            <field name="active" eval="True"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="code">
+records = env['library.reservation'].search([
+    ('state', '=', 'reserved'),
+    ('expiry_date', '&lt;', fields.Date.today()),
+])
+records.write({'state': 'expired'})
+for rec in records:
+    rec.book_id._compute_available_copies()
+            </field>
+        </record>
+
+    </data>
+
+</odoo>

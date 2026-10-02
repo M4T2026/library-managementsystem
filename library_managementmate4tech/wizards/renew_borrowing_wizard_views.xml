@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="renew_borrowing_wizard_view_form" model="ir.ui.view">
+        <field name="name">renew.borrowing.wizard.view.form</field>
+        <field name="model">renew.borrowing.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Renew Borrowing">
+                <sheet>
+                    <div class="text-center mb-3">
+                        <h3><i class="fa fa-refresh me-2 text-info"/>Renew Borrowing</h3>
+                        <p class="text-muted">Extend the due date for a borrowed book.</p>
+                    </div>
+                    <group>
+                        <group string="Borrowing Details">
+                            <field name="borrowing_id" options="{'no_create': True}"/>
+                            <field name="member_id" readonly="1"/>
+                            <field name="book_id" readonly="1"/>
+                        </group>
+                        <group string="Renewal">
+                            <field name="current_due_date" readonly="1"/>
+                            <field name="renewal_count" readonly="1"/>
+                            <field name="max_renewals" readonly="1"/>
+                            <field name="extra_days"/>
+                            <field name="new_due_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning"
+                         invisible="renewal_count &lt; max_renewals">
+                        <i class="fa fa-exclamation-triangle me-1"/>
+                        Maximum renewals reached. This borrowing cannot be renewed further.
+                    </div>
+                    <field name="notes" placeholder="Notes..."/>
+                </sheet>
+                <footer>
+                    <button name="action_renew" string="Renew"
+                            type="object" class="btn-info"
+                            invisible="renewal_count >= max_renewals"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="renew_borrowing_wizard_action" model="ir.actions.act_window">
+        <field name="name">Renew Borrowing</field>
+        <field name="res_model">renew.borrowing.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

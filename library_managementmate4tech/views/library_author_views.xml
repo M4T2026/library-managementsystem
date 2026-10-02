@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Author Kanban View -->
+    <record id="library_author_view_kanban" model="ir.ui.view">
+        <field name="name">library.author.view.kanban</field>
+        <field name="model">library.author</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_group_by="" sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="image"/>
+                <field name="book_count"/>
+                <field name="nationality"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                            <div class="o_kanban_image_fill_left o_kanban_image" role="img">
+                                <img t-if="record.image.raw_value" t-att-src="kanban_image('library.author', 'image', record.id.raw_value)" class="o_image_64_cover" alt="Author"/>
+                                <div t-else="" class="o_kanban_image_placeholder o_image_64_cover" style="background:#7c7bad">
+                                    <span class="oi oi-user" style="font-size:2rem;color:#fff"/>
+                                </div>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title"><field name="name"/></strong>
+                                <div class="o_kanban_tags_section">
+                                    <span t-if="record.nationality.raw_value" class="badge text-bg-info">
+                                        <field name="nationality"/>
+                                    </span>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span><i class="fa fa-book"/> <field name="book_count"/> Books</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Author List View -->
+    <record id="library_author_view_list" model="ir.ui.view">
+        <field name="name">library.author.view.list</field>
+        <field name="model">library.author</field>
+        <field name="arch" type="xml">
+            <list string="Authors">
+                <field name="image" widget="image" options="{'size': [32, 32]}"/>
+                <field name="name"/>
+                <field name="nationality"/>
+                <field name="email"/>
+                <field name="book_count"/>
+                <field name="gender"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Author Form View -->
+    <record id="library_author_view_form" model="ir.ui.view">
+        <field name="name">library.author.view.form</field>
+        <field name="model">library.author</field>
+        <field name="arch" type="xml">
+            <form string="Author">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_books" type="object" class="oe_stat_button" icon="fa-book">
+                            <field name="book_count" widget="statinfo" string="Books"/>
+                        </button>
+                    </div>
+                    <field name="image" widget="image" class="oe_avatar" options="{'preview_image': 'image'}"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Author Name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Personal Info">
+                            <field name="gender"/>
+                            <field name="nationality"/>
+                            <field name="birth_date"/>
+                            <field name="death_date"/>
+                        </group>
+                        <group string="Contact">
+                            <field name="email" widget="email"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="website" widget="url"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Biography">
+                            <field name="biography" placeholder="Write a short biography..."/>
+                        </page>
+                        <page string="Books">
+                            <field name="book_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="category_id"/>
+                                    <field name="publisher_id"/>
+                                    <field name="state"/>
+                                    <field name="available_copies"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Author Search View -->
+    <record id="library_author_view_search" model="ir.ui.view">
+        <field name="name">library.author.view.search</field>
+        <field name="model">library.author</field>
+        <field name="arch" type="xml">
+            <search string="Search Authors">
+                <field name="name"/>
+                <field name="nationality"/>
+                <filter string="Archived" name="archived" domain="[('active','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Nationality" name="group_nationality" context="{'group_by': 'nationality'}"/>
+                    <filter string="Gender" name="group_gender" context="{'group_by': 'gender'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Author Action -->
+    <record id="library_author_action" model="ir.actions.act_window">
+        <field name="name">Authors</field>
+        <field name="res_model">library.author</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="library_author_view_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Member Card Report -->
+    <record id="action_report_member_card" model="ir.actions.report">
+        <field name="name">Library Member Card</field>
+        <field name="model">library.member</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">library_management.report_member_card_document</field>
+        <field name="report_file">library_management.report_member_card_document</field>
+        <field name="print_report_name">'Member Card - ' + object.name</field>
+        <field name="binding_model_id" ref="model_library_member"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>
