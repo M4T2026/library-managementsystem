@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="1">
+
+        <!-- Book Sequence -->
+        <record id="seq_library_book" model="ir.sequence">
+            <field name="name">Library Book</field>
+            <field name="code">library.book</field>
+            <field name="prefix">BK/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Member Sequence -->
+        <record id="seq_library_member" model="ir.sequence">
+            <field name="name">Library Member</field>
+            <field name="code">library.member</field>
+            <field name="prefix">MEM/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Borrowing Sequence -->
+        <record id="seq_library_borrowing" model="ir.sequence">
+            <field name="name">Library Borrowing</field>
+            <field name="code">library.borrowing</field>
+            <field name="prefix">BRW/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Reservation Sequence -->
+        <record id="seq_library_reservation" model="ir.sequence">
+            <field name="name">Library Reservation</field>
+            <field name="code">library.reservation</field>
+            <field name="prefix">RES/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Fine Sequence -->
+        <record id="seq_library_fine" model="ir.sequence">
+            <field name="name">Library Fine</field>
+            <field name="code">library.fine</field>
+            <field name="prefix">FIN/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+    </data>
+
+</odoo>

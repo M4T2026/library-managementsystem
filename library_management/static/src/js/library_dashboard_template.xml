@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+<t t-name="library_management.DashboardTemplate">
+    <div class="o_library_dashboard">
+
+        <!-- Loading Spinner -->
+        <div t-if="state.loading" class="o_lib_loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading Library Dashboard...</p>
+        </div>
+
+        <t t-if="!state.loading and state.data">
+            <!-- Header Banner -->
+            <div class="o_lib_header">
+                <div class="o_lib_header_inner">
+                    <div>
+                        <h2 class="o_lib_title">
+                            <i class="fa fa-book-open me-2"/>Library Management Dashboard
+                        </h2>
+                        <p class="o_lib_subtitle">Real-time overview of your library operations</p>
+                    </div>
+                    <div class="o_lib_header_logo">
+                        <i class="fa fa-university"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Cards Row -->
+            <div class="o_lib_kpi_row">
+
+                <!-- Total Books -->
+                <div class="o_lib_kpi_card o_lib_kpi_books" t-on-click="goToBooks">
+                    <div class="o_lib_kpi_icon"><i class="fa fa-book"/></div>
+                    <div class="o_lib_kpi_content">
+                        <div class="o_lib_kpi_value" t-esc="state.data.total_books"/>
+                        <div class="o_lib_kpi_label">Total Books</div>
+                        <div class="o_lib_kpi_sub">
+                            <span class="text-success"><t t-esc="state.data.available_books"/> Available</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Members -->
+                <div class="o_lib_kpi_card o_lib_kpi_members" t-on-click="goToMembers">
+                    <div class="o_lib_kpi_icon"><i class="fa fa-users"/></div>
+                    <div class="o_lib_kpi_content">
+                        <div class="o_lib_kpi_value" t-esc="state.data.total_members"/>
+                        <div class="o_lib_kpi_label">Total Members</div>
+                        <div class="o_lib_kpi_sub">
+                            <span class="text-success"><t t-esc="state.data.active_members"/> Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Borrowings -->
+                <div class="o_lib_kpi_card o_lib_kpi_borrowings" t-on-click="goToBorrowings">
+                    <div class="o_lib_kpi_icon"><i class="fa fa-exchange"/></div>
+                    <div class="o_lib_kpi_content">
+                        <div class="o_lib_kpi_value" t-esc="state.data.active_borrowings"/>
+                        <div class="o_lib_kpi_label">Active Borrowings</div>
+                        <div class="o_lib_kpi_sub">
+                            <span><t t-esc="state.data.borrowed_this_month"/> This Month</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overdue -->
+                <div class="o_lib_kpi_card o_lib_kpi_overdue" t-on-click="goToOverdue">
+                    <div class="o_lib_kpi_icon"><i class="fa fa-clock-o"/></div>
+                    <div class="o_lib_kpi_content">
+                        <div class="o_lib_kpi_value text-danger" t-esc="state.data.overdue_borrowings"/>
+                        <div class="o_lib_kpi_label">Overdue Books</div>
+                        <div class="o_lib_kpi_sub">
+                            <span class="text-danger" t-if="state.data.overdue_borrowings > 0">Needs attention!</span>
+                            <span class="text-success" t-else="">All on time</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fines -->
+                <div class="o_lib_kpi_card o_lib_kpi_fines" t-on-click="goToFines">
+                    <div class="o_lib_kpi_icon"><i class="fa fa-money"/></div>
+                    <div class="o_lib_kpi_content">
+                        <div class="o_lib_kpi_value" t-esc="state.data.total_fines.toFixed(2)"/>
+                        <div class="o_lib_kpi_label">Outstanding Fines</div>
+                        <div class="o_lib_kpi_sub">
+                            <span><t t-esc="state.data.active_reservations"/> Reservations</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Charts Row -->
+            <div class="o_lib_charts_row">
+
+                <!-- Borrowing Trend Chart -->
+                <div class="o_lib_chart_card o_lib_chart_large">
+                    <div class="o_lib_chart_header">
+                        <h5><i class="fa fa-line-chart me-2"/>Borrowing Trend (Last 6 Months)</h5>
+                    </div>
+                    <div class="o_lib_chart_body">
+                        <canvas id="lib_trend_chart" width="600" height="200"/>
+                    </div>
+                </div>
+
+                <!-- Category Distribution -->
+                <div class="o_lib_chart_card o_lib_chart_small">
+                    <div class="o_lib_chart_header">
+                        <h5><i class="fa fa-pie-chart me-2"/>Books by Category</h5>
+                    </div>
+                    <div class="o_lib_chart_body o_lib_donut_wrapper">
+                        <canvas id="lib_category_chart" width="200" height="200"/>
+                        <div class="o_lib_legend">
+                            <t t-foreach="state.data.category_data" t-as="cat" t-key="cat.name">
+                                <div class="o_lib_legend_item">
+                                    <span class="o_lib_legend_dot"
+                                          t-attf-style="background:#{['#7c7bad','#5b9bd5','#ed7d31','#70ad47','#ffc000'][cat_index % 5]}"/>
+                                    <span t-esc="cat.name"/>
+                                    <span class="ms-auto fw-bold" t-esc="cat.count"/>
+                                </div>
+                            </t>
+                            <div t-if="!state.data.category_data.length" class="text-muted text-center mt-3">
+                                No category data
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom Row: Stats + Top Books -->
+            <div class="o_lib_bottom_row">
+
+                <!-- Quick Stats -->
+                <div class="o_lib_stat_card">
+                    <div class="o_lib_chart_header">
+                        <h5><i class="fa fa-tachometer me-2"/>Quick Stats</h5>
+                    </div>
+                    <div class="o_lib_stat_list">
+                        <div class="o_lib_stat_item" t-on-click="goToAvailableBooks">
+                            <span class="o_lib_stat_dot" style="background:#28a745"/>
+                            <span>Available Books</span>
+                            <span class="ms-auto fw-bold text-success" t-esc="state.data.available_books"/>
+                        </div>
+                        <div class="o_lib_stat_item" t-on-click="goToBorrowedBooks">
+                            <span class="o_lib_stat_dot" style="background:#ffc107"/>
+                            <span>Borrowed Books</span>
+                            <span class="ms-auto fw-bold text-warning" t-esc="state.data.borrowed_books"/>
+                        </div>
+                        <div class="o_lib_stat_item" t-on-click="goToOverdue">
+                            <span class="o_lib_stat_dot" style="background:#dc3545"/>
+                            <span>Overdue</span>
+                            <span class="ms-auto fw-bold text-danger" t-esc="state.data.overdue_borrowings"/>
+                        </div>
+                        <div class="o_lib_stat_item" t-on-click="goToActiveMembers">
+                            <span class="o_lib_stat_dot" style="background:#17a2b8"/>
+                            <span>Active Members</span>
+                            <span class="ms-auto fw-bold text-info" t-esc="state.data.active_members"/>
+                        </div>
+                        <div class="o_lib_stat_item">
+                            <span class="o_lib_stat_dot" style="background:#6c757d"/>
+                            <span>Expired Memberships</span>
+                            <span class="ms-auto fw-bold text-muted" t-esc="state.data.expired_members"/>
+                        </div>
+                        <div class="o_lib_stat_item" t-on-click="goToReservations">
+                            <span class="o_lib_stat_dot" style="background:#6f42c1"/>
+                            <span>Active Reservations</span>
+                            <span class="ms-auto fw-bold" t-esc="state.data.active_reservations"/>
+                        </div>
+                        <div class="o_lib_stat_item">
+                            <span class="o_lib_stat_dot" style="background:#20c997"/>
+                            <span>Returned Today</span>
+                            <span class="ms-auto fw-bold text-success" t-esc="state.data.returned_today"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Borrowed Books -->
+                <div class="o_lib_stat_card o_lib_top_books">
+                    <div class="o_lib_chart_header">
+                        <h5><i class="fa fa-star me-2"/>Most Borrowed Books (30 Days)</h5>
+                    </div>
+                    <div class="o_lib_stat_list">
+                        <t t-if="state.data.top_books.length > 0">
+                            <t t-foreach="state.data.top_books" t-as="book" t-key="book.name">
+                                <div class="o_lib_top_book_item">
+                                    <span class="o_lib_rank_badge" t-esc="book_index + 1"/>
+                                    <span class="flex-grow-1 text-truncate" t-esc="book.name"/>
+                                    <div class="o_lib_bar_wrap">
+                                        <div class="o_lib_bar_fill"
+                                             t-attf-style="width:#{Math.round((book.count / state.data.top_books[0].count) * 100)}%"/>
+                                    </div>
+                                    <span class="o_lib_borrow_count" t-esc="book.count"/>
+                                </div>
+                            </t>
+                        </t>
+                        <div t-else="" class="text-center text-muted mt-4 py-4">
+                            <i class="fa fa-book fa-3x mb-3 d-block opacity-25"/>
+                            No borrowing data yet
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </t>
+
+    </div>
+</t>
+
+</templates>
