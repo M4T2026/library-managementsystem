@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="library_management.Dashboard">
+        <div class="o_library_dashboard o_action overflow-auto">
+            <div class="o_lib_wrap p-3 p-md-4">
+
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-2">
+                    <div>
+                        <h2 class="mb-0 fw-bold">Library Dashboard</h2>
+                        <div class="text-muted">Live overview of your collection, members and loans</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-light border" t-on-click="load" title="Refresh">
+                            <i class="fa fa-refresh" t-att-class="{'fa-spin': state.loading}"/> Refresh
+                        </button>
+                        <button class="btn btn-primary" t-on-click="newLoan">
+                            <i class="fa fa-plus"/> New Loan
+                        </button>
+                    </div>
+                </div>
+
+                <t t-if="state.data">
+                    <!-- KPI cards -->
+                    <div class="o_lib_kpis mb-4">
+                        <t t-foreach="kpis" t-as="kpi" t-key="kpi.key">
+                            <div t-attf-class="o_lib_card o_lib_kpi o_lib_tone_#{kpi.tone}" t-on-click="kpi.onClick" role="button">
+                                <div class="o_lib_kpi_icon"><i t-attf-class="fa #{kpi.icon}"/></div>
+                                <div class="o_lib_kpi_body">
+                                    <div class="o_lib_kpi_value" t-esc="kpi.value"/>
+                                    <div class="o_lib_kpi_label" t-esc="kpi.label"/>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <!-- Loans per month -->
+                        <div class="col-12 col-xl-7">
+                            <div class="o_lib_card p-3 h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">Loans &amp; Returns · last 6 months</h5>
+                                    <div class="small">
+                                        <span class="o_lib_dot o_lib_dot_loans"/> Loans
+                                        <span class="o_lib_dot o_lib_dot_returns ms-3"/> Returns
+                                    </div>
+                                </div>
+                                <div class="o_lib_chart">
+                                    <t t-foreach="state.data.months" t-as="m" t-key="m.label">
+                                        <div class="o_lib_chart_col">
+                                            <div class="o_lib_chart_bars">
+                                                <div class="o_lib_bar o_lib_bar_loans" t-att-style="'height:' + pct(m.loans, maxMonth) + '%'" t-att-title="m.loans + ' loans'">
+                                                    <span t-if="m.loans" t-esc="m.loans"/>
+                                                </div>
+                                                <div class="o_lib_bar o_lib_bar_returns" t-att-style="'height:' + pct(m.returns, maxMonth) + '%'" t-att-title="m.returns + ' returns'">
+                                                    <span t-if="m.returns" t-esc="m.returns"/>
+                                                </div>
+                                            </div>
+                                            <div class="o_lib_chart_label" t-esc="m.label"/>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top books -->
+                        <div class="col-12 col-md-6 col-xl-5">
+                            <div class="o_lib_card p-3 h-100">
+                                <h5 class="mb-3">Most Borrowed Books</h5>
+                                <t t-if="!state.data.top_books.length"><div class="text-muted">No loans yet.</div></t>
+                                <t t-foreach="state.data.top_books" t-as="b" t-key="b_index">
+                                    <div class="o_lib_hbar mb-2">
+                                        <div class="d-flex justify-content-between small">
+                                            <span class="text-truncate pe-2" t-esc="b.name"/>
+                                            <span class="fw-bold" t-esc="b.count"/>
+                                        </div>
+                                        <div class="o_lib_track"><div class="o_lib_fill" t-att-style="'width:' + pct(b.count, maxTop) + '%'"/></div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Overdue -->
+                        <div class="col-12 col-xl-7">
+                            <div class="o_lib_card p-3 h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="mb-0">Overdue Loans</h5>
+                                    <a href="#" class="small" t-on-click.prevent="() => this.openList('Overdue Loans', 'library.loan', [['state', '=', 'overdue']])">View all</a>
+                                </div>
+                                <t t-if="!state.data.overdue_loans.length">
+                                    <div class="text-success py-3"><i class="fa fa-smile-o"/> Nothing overdue. Well done!</div>
+                                </t>
+                                <table class="table table-sm table-hover align-middle mb-0" t-if="state.data.overdue_loans.length">
+                                    <thead><tr><th>Member</th><th>Book</th><th>Due</th><th class="text-end">Late</th><th class="text-end">Fine</th></tr></thead>
+                                    <tbody>
+                                        <t t-foreach="state.data.overdue_loans" t-as="l" t-key="l.id">
+                                            <tr role="button" t-on-click="() => this.openLoan(l.id)">
+                                                <td t-esc="l.member"/>
+                                                <td class="text-truncate o_lib_cell" t-esc="l.book"/>
+                                                <td t-esc="l.due_date"/>
+                                                <td class="text-end"><span class="badge text-bg-danger"><t t-esc="l.days_late"/> d</span></td>
+                                                <td class="text-end" t-esc="money(l.fine)"/>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Categories + recent -->
+                        <div class="col-12 col-xl-5">
+                            <div class="o_lib_card p-3 mb-3">
+                                <h5 class="mb-3">Loans by Category</h5>
+                                <t t-if="!state.data.categories.length"><div class="text-muted">No data yet.</div></t>
+                                <t t-foreach="state.data.categories" t-as="c" t-key="c_index">
+                                    <div class="o_lib_hbar mb-2">
+                                        <div class="d-flex justify-content-between small">
+                                            <span t-esc="c.name"/><span class="fw-bold" t-esc="c.count"/>
+                                        </div>
+                                        <div class="o_lib_track"><div class="o_lib_fill o_lib_fill_alt" t-att-style="'width:' + pct(c.count, maxCategory) + '%'"/></div>
+                                    </div>
+                                </t>
+                            </div>
+                            <div class="o_lib_card p-3">
+                                <h5 class="mb-2">Recent Activity</h5>
+                                <t t-if="!state.data.recent_loans.length"><div class="text-muted">No loans yet.</div></t>
+                                <t t-foreach="state.data.recent_loans" t-as="l" t-key="l.id">
+                                    <div class="o_lib_recent d-flex justify-content-between" role="button" t-on-click="() => this.openLoan(l.id)">
+                                        <div class="text-truncate pe-2">
+                                            <span class="fw-semibold" t-esc="l.member"/>
+                                            <span class="text-muted"> · <t t-esc="l.book"/></span>
+                                        </div>
+                                        <span t-attf-class="badge o_lib_state_#{l.state}" t-esc="l.state"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="text-center text-muted p-5"><i class="fa fa-circle-o-notch fa-spin fa-2x"/></div>
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>

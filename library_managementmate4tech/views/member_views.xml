@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="library_member_view_form" model="ir.ui.view">
+        <field name="name">library.member.form</field>
+        <field name="model">library.member</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_renew_membership" string="Renew Membership (1 year)" type="object"
+                            class="btn-primary" invisible="not id"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Expired" bg_color="text-bg-danger" invisible="not is_expired"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_loans" type="object" class="oe_stat_button" icon="fa-book">
+                            <field name="loan_count" widget="statinfo" string="Loans"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="member_number" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" context="{'default_is_company': False}"/>
+                            <field name="join_date"/>
+                            <field name="expiry_date"/>
+                            <field name="is_expired" invisible="1"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="max_loans"/>
+                            <field name="active_loan_count"/>
+                            <field name="unpaid_fines"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Loans" name="loans">
+                            <field name="loan_ids" readonly="1">
+                                <list decoration-danger="state == 'overdue'">
+                                    <field name="name"/>
+                                    <field name="book_id"/>
+                                    <field name="loan_date"/>
+                                    <field name="due_date"/>
+                                    <field name="return_date"/>
+                                    <field name="fine_amount" sum="Total"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="library_member_view_list" model="ir.ui.view">
+        <field name="name">library.member.list</field>
+        <field name="model">library.member</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="is_expired">
+                <field name="member_number"/>
+                <field name="name"/>
+                <field name="join_date" optional="show"/>
+                <field name="expiry_date"/>
+                <field name="active_loan_count"/>
+                <field name="unpaid_fines" sum="Total"/>
+                <field name="is_expired" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="library_member_view_search" model="ir.ui.view">
+        <field name="name">library.member.search</field>
+        <field name="model">library.member</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="member_number"/>
+                <filter name="expired" string="Expired"
+                        domain="[('expiry_date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="valid" string="Valid"
+                        domain="[('expiry_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="with_fines" string="Unpaid Fines" domain="[('loan_ids', 'any', [('fine_amount', '>', 0), ('fine_paid', '=', False)])]"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="library_member_action" model="ir.actions.act_window">
+        <field name="name">Members</field>
+        <field name="res_model">library.member</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register your first member</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="library_loan_view_form" model="ir.ui.view">
+        <field name="name">library.loan.form</field>
+        <field name="model">library.loan</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_borrow" string="Confirm Loan" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_return" string="Return" type="object" class="btn-primary"
+                            invisible="state not in ('borrowed', 'overdue')"/>
+                    <button name="action_renew" string="Renew" type="object"
+                            invisible="state != 'borrowed'"/>
+                    <button name="action_mark_lost" string="Mark as Lost" type="object"
+                            invisible="state not in ('borrowed', 'overdue')"
+                            confirm="Mark this copy as lost? The member will be charged the replacement price."/>
+                    <button name="action_pay_fine" string="Register Fine Payment" type="object"
+                            invisible="fine_paid or not fine_amount or state in ('draft', 'borrowed')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,borrowed,returned"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Fine Paid" bg_color="text-bg-success" invisible="not fine_paid"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="member_id" readonly="state != 'draft'"/>
+                            <field name="copy_id" readonly="state != 'draft'" options="{'no_create': True}"/>
+                            <field name="book_id"/>
+                        </group>
+                        <group>
+                            <field name="loan_date" readonly="state != 'draft'"/>
+                            <field name="due_date" readonly="state not in ('draft', 'borrowed')"/>
+                            <field name="return_date"/>
+                            <field name="renew_count"/>
+                        </group>
+                    </group>
+                    <group string="Fine" invisible="state == 'draft'">
+                        <group>
+                            <field name="days_late"/>
+                            <field name="fine_amount"/>
+                            <field name="fine_paid"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Internal notes..."/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="library_loan_view_list" model="ir.ui.view">
+        <field name="name">library.loan.list</field>
+        <field name="model">library.loan</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="state == 'overdue'" decoration-success="state == 'returned'"
+                  decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="book_id"/>
+                <field name="copy_id" optional="hide"/>
+                <field name="loan_date"/>
+                <field name="due_date"/>
+                <field name="return_date" optional="show"/>
+                <field name="fine_amount" sum="Total Fines"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'borrowed'" decoration-danger="state == 'overdue'"
+                       decoration-success="state == 'returned'" decoration-warning="state == 'lost'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="library_loan_view_search" model="ir.ui.view">
+        <field name="name">library.loan.search</field>
+        <field name="model">library.loan</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="book_id"/>
+                <field name="copy_id"/>
+                <filter name="active_loans" string="On Loan" domain="[('state', 'in', ('borrowed', 'overdue'))]"/>
+                <filter name="overdue" string="Overdue" domain="[('state', '=', 'overdue')]"/>
+                <filter name="returned" string="Returned" domain="[('state', '=', 'returned')]"/>
+                <filter name="unpaid" string="Unpaid Fines" domain="[('fine_amount', '>', 0), ('fine_paid', '=', False)]"/>
+                <group>
+                    <filter name="group_member" string="Member" context="{'group_by': 'member_id'}"/>
+                    <filter name="group_book" string="Book" context="{'group_by': 'book_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_month" string="Loan Month" context="{'group_by': 'loan_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="library_loan_view_pivot" model="ir.ui.view">
+        <field name="name">library.loan.pivot</field>
+        <field name="model">library.loan</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="category_id" type="row"/>
+                <field name="loan_date" interval="month" type="col"/>
+                <field name="fine_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="library_loan_view_graph" model="ir.ui.view">
+        <field name="name">library.loan.graph</field>
+        <field name="model">library.loan</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="loan_date" interval="month"/>
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="library_loan_action" model="ir.actions.act_window">
+        <field name="name">Loans</field>
+        <field name="res_model">library.loan</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active_loans': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first loan</p>
+            <p>Pick a member and an available copy, then confirm the loan.</p>
+        </field>
+    </record>
+
+    <record id="library_loan_overdue_action" model="ir.actions.act_window">
+        <field name="name">Overdue Loans</field>
+        <field name="res_model">library.loan</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_overdue': 1}</field>
+    </record>
+
+    <record id="library_loan_report_action" model="ir.actions.act_window">
+        <field name="name">Loan Analysis</field>
+        <field name="res_model">library.loan</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="context">{'search_default_group_state': 1}</field>
+    </record>
+</odoo>

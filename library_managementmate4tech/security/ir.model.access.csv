@@ -1,21 +1,13 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_library_category_user,library.category.user,model_library_category,group_library_user,1,1,1,0
-access_library_category_manager,library.category.manager,model_library_category,group_library_manager,1,1,1,1
-access_library_publisher_user,library.publisher.user,model_library_publisher,group_library_user,1,1,1,0
-access_library_publisher_manager,library.publisher.manager,model_library_publisher,group_library_manager,1,1,1,1
-access_library_author_user,library.author.user,model_library_author,group_library_user,1,1,1,0
-access_library_author_manager,library.author.manager,model_library_author,group_library_manager,1,1,1,1
-access_library_book_user,library.book.user,model_library_book,group_library_user,1,1,1,0
-access_library_book_manager,library.book.manager,model_library_book,group_library_manager,1,1,1,1
-access_library_tag_user,library.tag.user,model_library_tag,group_library_user,1,1,1,0
-access_library_tag_manager,library.tag.manager,model_library_tag,group_library_manager,1,1,1,1
-access_library_member_user,library.member.user,model_library_member,group_library_user,1,1,1,0
-access_library_member_manager,library.member.manager,model_library_member,group_library_manager,1,1,1,1
-access_library_borrowing_user,library.borrowing.user,model_library_borrowing,group_library_user,1,1,1,0
-access_library_borrowing_manager,library.borrowing.manager,model_library_borrowing,group_library_manager,1,1,1,1
-access_library_reservation_user,library.reservation.user,model_library_reservation,group_library_user,1,1,1,0
-access_library_reservation_manager,library.reservation.manager,model_library_reservation,group_library_manager,1,1,1,1
-access_library_fine_user,library.fine.user,model_library_fine,group_library_user,1,1,1,0
-access_library_fine_manager,library.fine.manager,model_library_fine,group_library_manager,1,1,1,1
-access_library_dashboard_user,library.dashboard.user,model_library_dashboard,group_library_user,1,0,0,0
-access_library_dashboard_manager,library.dashboard.manager,model_library_dashboard,group_library_manager,1,1,1,1
+access_library_author_user,library.author user,model_library_author,group_library_user,1,0,0,0
+access_library_author_manager,library.author manager,model_library_author,group_library_manager,1,1,1,1
+access_library_category_user,library.category user,model_library_category,group_library_user,1,0,0,0
+access_library_category_manager,library.category manager,model_library_category,group_library_manager,1,1,1,1
+access_library_book_user,library.book user,model_library_book,group_library_user,1,0,0,0
+access_library_book_manager,library.book manager,model_library_book,group_library_manager,1,1,1,1
+access_library_book_copy_user,library.book.copy user,model_library_book_copy,group_library_user,1,1,1,0
+access_library_book_copy_manager,library.book.copy manager,model_library_book_copy,group_library_manager,1,1,1,1
+access_library_member_user,library.member user,model_library_member,group_library_user,1,1,1,0
+access_library_member_manager,library.member manager,model_library_member,group_library_manager,1,1,1,1
+access_library_loan_user,library.loan user,model_library_loan,group_library_user,1,1,1,1
+access_library_loan_manager,library.loan manager,model_library_loan,group_library_manager,1,1,1,1

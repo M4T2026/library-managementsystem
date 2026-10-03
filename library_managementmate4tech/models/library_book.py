@@ -1,160 +1,129 @@
-# -*- coding: utf-8 -*-
-from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError
+from odoo import api, fields, models
+
+
+class LibraryAuthor(models.Model):
+    _name = 'library.author'
+    _description = 'Library Author'
+    _order = 'name'
+
+    name = fields.Char(required=True)
+    biography = fields.Text()
+    image = fields.Image(max_width=256, max_height=256)
+    book_ids = fields.Many2many(
+        'library.book', 'library_book_author_rel', 'author_id', 'book_id', string='Books')
+    book_count = fields.Integer(compute='_compute_book_count')
+
+    @api.depends('book_ids')
+    def _compute_book_count(self):
+        for author in self:
+            author.book_count = len(author.book_ids)
+
+
+class LibraryCategory(models.Model):
+    _name = 'library.category'
+    _description = 'Book Category'
+    _order = 'name'
+
+    name = fields.Char(required=True, translate=True)
+    color = fields.Integer()
+    book_ids = fields.One2many('library.book', 'category_id', string='Books')
+    book_count = fields.Integer(compute='_compute_book_count')
+
+    _name_uniq = models.Constraint('UNIQUE(name)', 'Category name must be unique.')
+
+    @api.depends('book_ids')
+    def _compute_book_count(self):
+        for categ in self:
+            categ.book_count = len(categ.book_ids)
 
 
 class LibraryBook(models.Model):
     _name = 'library.book'
     _description = 'Library Book'
-    _rec_name = 'name'
-    _order = 'name'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'name'
 
-    # ── Basic Info ──────────────────────────────────────────────────────────
-    name = fields.Char(string='Title', required=True, tracking=True, index=True)
-    isbn = fields.Char(string='ISBN', index=True)
-    isbn13 = fields.Char(string='ISBN-13')
-    barcode = fields.Char(string='Barcode', index=True)
-    ref = fields.Char(
-        string='Reference', default=lambda self: _('New'),
-        readonly=True, copy=False, index=True
-    )
-    image = fields.Image(string='Cover Image', max_width=512, max_height=512)
-    image_small = fields.Image(string='Cover (Small)', related='image',
-                                max_width=128, max_height=128, store=True)
-    description = fields.Html(string='Description')
-    short_description = fields.Text(string='Short Description')
-    notes = fields.Text(string='Internal Notes')
-
-    # ── Classification ───────────────────────────────────────────────────────
-    category_id = fields.Many2one(
-        'library.category', string='Category', required=True, tracking=True,
-        index=True
-    )
+    name = fields.Char(string='Title', required=True, tracking=True)
+    isbn = fields.Char(string='ISBN', copy=False, tracking=True)
     author_ids = fields.Many2many(
-        'library.author', 'library_book_author_rel', 'book_id', 'author_id',
-        string='Authors', required=True
-    )
-    publisher_id = fields.Many2one('library.publisher', string='Publisher', tracking=True)
-    language = fields.Selection([
-        ('en', 'English'), ('ar', 'Arabic'), ('fr', 'French'),
-        ('de', 'German'), ('es', 'Spanish'), ('ur', 'Urdu'),
-        ('zh', 'Chinese'), ('ja', 'Japanese'), ('other', 'Other'),
-    ], string='Language', default='en')
-    edition = fields.Char(string='Edition')
-    pages = fields.Integer(string='Pages')
-    publication_year = fields.Integer(string='Publication Year')
-    tag_ids = fields.Many2many('library.tag', string='Tags')
-
-    # ── Inventory ───────────────────────────────────────────────────────────
-    total_copies = fields.Integer(string='Total Copies', default=1, tracking=True)
-    available_copies = fields.Integer(
-        string='Available Copies', compute='_compute_available_copies', store=True
-    )
-    borrowed_copies = fields.Integer(
-        string='Borrowed Copies', compute='_compute_available_copies', store=True
-    )
-    reserved_copies = fields.Integer(
-        string='Reserved Copies', compute='_compute_available_copies', store=True
-    )
-    location = fields.Char(string='Shelf Location')
-    rack_number = fields.Char(string='Rack Number')
-
-    # ── Pricing ─────────────────────────────────────────────────────────────
-    price = fields.Float(string='Price', digits=(10, 2))
+        'library.author', 'library_book_author_rel', 'book_id', 'author_id', string='Authors')
+    category_id = fields.Many2one('library.category', string='Category', tracking=True)
+    publisher = fields.Char()
+    publication_year = fields.Integer()
+    language = fields.Char(default='English')
+    pages = fields.Integer()
+    price = fields.Monetary(string='Replacement Price', currency_field='currency_id')
     currency_id = fields.Many2one(
-        'res.currency', string='Currency',
-        default=lambda self: self.env.company.currency_id
-    )
+        'res.currency', default=lambda self: self.env.company.currency_id)
+    cover = fields.Image(max_width=512, max_height=512)
+    description = fields.Html()
+    active = fields.Boolean(default=True)
 
-    # ── State ───────────────────────────────────────────────────────────────
-    state = fields.Selection([
-        ('available', 'Available'),
-        ('borrowed', 'Borrowed'),
-        ('reserved', 'Reserved'),
-        ('lost', 'Lost'),
-        ('damaged', 'Damaged'),
-        ('maintenance', 'Under Maintenance'),
-    ], string='Status', default='available', tracking=True, compute='_compute_state', store=True)
+    copy_ids = fields.One2many('library.book.copy', 'book_id', string='Copies')
+    copy_count = fields.Integer(compute='_compute_copy_stats', store=True)
+    available_count = fields.Integer(compute='_compute_copy_stats', store=True)
+    loan_count = fields.Integer(compute='_compute_loan_count')
 
-    active = fields.Boolean(string='Active', default=True)
+    _isbn_uniq = models.Constraint('UNIQUE(isbn)', 'This ISBN already exists.')
 
-    # ── Relations ───────────────────────────────────────────────────────────
-    borrowing_ids = fields.One2many('library.borrowing', 'book_id', string='Borrowings')
-    reservation_ids = fields.One2many('library.reservation', 'book_id', string='Reservations')
-    total_borrow_count = fields.Integer(
-        string='Total Borrows', compute='_compute_total_borrow_count', store=True
-    )
-
-    # ── Compute Methods ─────────────────────────────────────────────────────
-    @api.depends('borrowing_ids', 'borrowing_ids.state', 'reservation_ids', 'reservation_ids.state', 'total_copies')
-    def _compute_available_copies(self):
+    @api.depends('copy_ids.state', 'copy_ids.active')
+    def _compute_copy_stats(self):
         for book in self:
-            borrowed = self.env['library.borrowing'].search_count([
-                ('book_id', '=', book.id),
-                ('state', 'in', ['borrowed', 'overdue']),
-            ])
-            reserved = self.env['library.reservation'].search_count([
-                ('book_id', '=', book.id),
-                ('state', '=', 'reserved'),
-            ])
-            book.borrowed_copies = borrowed
-            book.reserved_copies = reserved
-            book.available_copies = max(book.total_copies - borrowed - reserved, 0)
+            copies = book.copy_ids
+            book.copy_count = len(copies)
+            book.available_count = len(copies.filtered(lambda c: c.state == 'available'))
 
-    @api.depends('available_copies', 'total_copies', 'borrowed_copies')
-    def _compute_state(self):
+    def _compute_loan_count(self):
+        data = dict(self.env['library.loan']._read_group(
+            [('book_id', 'in', self.ids)], ['book_id'], ['__count']))
         for book in self:
-            if book.available_copies > 0:
-                book.state = 'available'
-            elif book.borrowed_copies > 0:
-                book.state = 'borrowed'
-            else:
-                book.state = 'available'
+            book.loan_count = data.get(book, 0)
 
-    @api.depends('borrowing_ids')
-    def _compute_total_borrow_count(self):
-        for book in self:
-            book.total_borrow_count = len(book.borrowing_ids)
+    def action_add_copy(self):
+        self.ensure_one()
+        self.env['library.book.copy'].create({'book_id': self.id})
+        return True
 
-    # ── ORM Overrides ────────────────────────────────────────────────────────
-    @api.model_create_multi
-    def create(self, vals_list):
-        for vals in vals_list:
-            if vals.get('ref', _('New')) == _('New'):
-                vals['ref'] = self.env['ir.sequence'].next_by_code('library.book') or _('New')
-        return super().create(vals_list)
-
-    @api.constrains('total_copies')
-    def _check_total_copies(self):
-        for book in self:
-            if book.total_copies < 1:
-                raise ValidationError(_('Total copies must be at least 1.'))
-            if book.total_copies < book.borrowed_copies:
-                raise ValidationError(_(
-                    'Total copies cannot be less than currently borrowed copies (%d).'
-                ) % book.borrowed_copies)
-
-    def action_mark_lost(self):
-        self.write({'state': 'lost'})
-
-    def action_mark_available(self):
-        self.write({'state': 'available'})
-
-    def action_view_borrowings(self):
+    def action_view_loans(self):
+        self.ensure_one()
         return {
-            'name': _('Borrowings'),
             'type': 'ir.actions.act_window',
-            'res_model': 'library.borrowing',
+            'name': self.name,
+            'res_model': 'library.loan',
             'view_mode': 'list,form',
             'domain': [('book_id', '=', self.id)],
-            'context': {'default_book_id': self.id},
         }
 
 
-class LibraryTag(models.Model):
-    _name = 'library.tag'
-    _description = 'Book Tag'
+class LibraryBookCopy(models.Model):
+    _name = 'library.book.copy'
+    _description = 'Book Copy'
+    _rec_name = 'barcode'
+    _order = 'book_id, barcode'
 
-    name = fields.Char(string='Tag', required=True)
-    color = fields.Integer(string='Color')
+    book_id = fields.Many2one('library.book', required=True, ondelete='cascade', index=True)
+    barcode = fields.Char(copy=False, index=True, readonly=True)
+    state = fields.Selection([
+        ('available', 'Available'),
+        ('borrowed', 'Borrowed'),
+        ('maintenance', 'In Maintenance'),
+        ('lost', 'Lost'),
+    ], default='available', required=True)
+    acquisition_date = fields.Date(default=fields.Date.context_today)
+    notes = fields.Char()
+    active = fields.Boolean(default=True)
+    loan_ids = fields.One2many('library.loan', 'copy_id', string='Loans')
+
+    _barcode_uniq = models.Constraint('UNIQUE(barcode)', 'Barcode must be unique.')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get('barcode'):
+                vals['barcode'] = self.env['ir.sequence'].next_by_code('library.book.copy')
+        return super().create(vals_list)
+
+    @api.depends('book_id.name', 'barcode')
+    def _compute_display_name(self):
+        for copy in self:
+            copy.display_name = f"{copy.book_id.name or ''} [{copy.barcode or 'New'}]"
